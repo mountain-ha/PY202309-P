@@ -1,58 +1,53 @@
+import pandas as pd
 import itertools
 
-def draw_kmap(num_vars):
-    # Draw a K-map table based on the number of variables
-    if num_vars == 2:
-        kmap = [[0, 0], [0, 0]]
-    elif num_vars == 3:
-        kmap = [[0, 0, 0, 0], [0, 0, 0, 0]]
-    elif num_vars == 4:
-        kmap = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
-    else:
-        print("Unsupported number of variables")
-        return
+def generate_gray_code(n):
+    """
+    n 비트에 대한 그레이 코드를 생성합니다.
+    """
+    gray_code = []
+    for i in range(2 ** n):
+        gray_code.append((i >> 1) ^ i)
+    return gray_code
 
-    # Populate the K-map with terms
-    terms = list(itertools.product([0, 1], repeat=num_vars))
-    for i in range(len(terms)):
-        for j in range(num_vars):
-            kmap[i][j] = terms[i][j]
+def draw_karnaugh_map(variables):
+    """
+    주어진 변수의 개수에 대한 카르노 맵을 그립니다.
+    """
+    n = 2 ** variables
+    gray_code = generate_gray_code(variables)
 
-    # Print the K-map
-    for row in kmap:
-        print(row)
+    # 카르노 맵을 나타내는 DataFrame 생성
+    karnaugh_map = pd.DataFrame(index=range(n), columns=range(variables))
 
-def simplify_boolean_function(kmap):
-    # Group adjacent cells with the same value together
-    grouped_cells = []
-    # Implementation of grouping logic goes here
+    # 각 칸에 해당하는 값 적기
+    for i in range(n):
+        for j in range(variables):
+            karnaugh_map.at[i, j] = gray_code[i] % 2
+            gray_code[i] //= 2
 
-    # Make the enclosed result a Boolean function
-    simplified_sop = ""
-    simplified_pos = ""
-    # Implementation of Boolean function simplification goes here
+    print("카르노 맵:")
+    print(karnaugh_map)
 
-    return simplified_sop, simplified_pos
+    # 각 칸의 숫자와 이진수를 매핑하는 딕셔너리 생성
+    mapping_dict = {}
+    for i in range(n):
+        binary_value = ''.join(map(str, karnaugh_map.iloc[i].tolist()))
+        mapping_dict[i] = binary_value
 
-def main():
-    # Get the number of variables from the user
-    num_vars = int(input("Enter the number of variables: "))
+    print("\n카르노 맵 숫자와 이진수 매핑:")
+    print(mapping_dict)
 
-    # Draw the K-map
-    draw_kmap(num_vars)
+# 사용자로부터 변수의 개수를 입력으로 받기
+num_variables = int(input("변수의 개수를 입력하세요 (2에서 4까지): "))
 
-    # Get the Boolean function from the user (assuming a simple format like "x'y + xy'")
-    boolean_function = input("Enter the Boolean function: ")
+if num_variables < 2 or num_variables > 4:
+    print("변수의 개수는 2에서 4까지의 값이어야 합니다.")
+else:
+    draw_karnaugh_map(num_variables)
 
-    # Convert the Boolean function to a K-map representation (0s and 1s)
-    kmap_representation = [[int(char) for char in row] for row in boolean_function.split('+')]
 
-    # Simplify the Boolean function using the K-map
-    simplified_sop, simplified_pos = simplify_boolean_function(kmap_representation)
 
-    # Print the simplified Boolean function
-    print("Simplified SOP:", simplified_sop)
-    print("Simplified POS:", simplified_pos)
 
-if __name__ == "__main__":
-    main()
+
+
