@@ -39,7 +39,7 @@ def draw_karnaugh_map(variables):
 
     return karnaugh_map, mapping_dict
 
-def optimize_boolean_function(karnaugh_map, mapping_dict, boolean_function):
+def ope_boolean_functiontimiz(karnaugh_map, mapping_dict, boolean_function):
     """
     카르노 맵을 이용하여 부울 함수를 최적화합니다.
     """
